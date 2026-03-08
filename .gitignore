@@ -1,6 +1,6 @@
-# Binary
-lore
-lore.exe
+# Binary (build output at repo root only)
+/lore
+/lore.exe
 /build/
 /dist/
 
