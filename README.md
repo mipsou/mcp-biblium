@@ -44,6 +44,23 @@ Add to **Claude Desktop** (`claude_desktop_config.json`):
 }
 ```
 
+Multiple instances with separate data directories:
+
+```json
+{
+  "mcpServers": {
+    "biblium-infra": {
+      "command": "/path/to/biblium",
+      "env": { "BIBLIUM_DATA_DIR": "/data/infra-docs" }
+    },
+    "biblium-dev": {
+      "command": "/path/to/biblium",
+      "env": { "BIBLIUM_DATA_DIR": "/data/dev-docs" }
+    }
+  }
+}
+```
+
 Then ask Claude: *"Create a collection called 'golang' and add my notes about error handling."*
 
 ### MCP Tools
@@ -130,6 +147,23 @@ Ajouter dans **Claude Desktop** (`claude_desktop_config.json`) :
       "env": {
         "BIBLIUM_DATA_DIR": "/chemin/vers/data"
       }
+    }
+  }
+}
+```
+
+Plusieurs instances avec des répertoires séparés :
+
+```json
+{
+  "mcpServers": {
+    "biblium-infra": {
+      "command": "/chemin/vers/biblium",
+      "env": { "BIBLIUM_DATA_DIR": "/data/docs-infra" }
+    },
+    "biblium-dev": {
+      "command": "/chemin/vers/biblium",
+      "env": { "BIBLIUM_DATA_DIR": "/data/docs-dev" }
     }
   }
 }
