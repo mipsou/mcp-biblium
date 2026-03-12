@@ -1,6 +1,6 @@
 # Biblium
 
-[English](#english) | [Fran\u00e7ais](#fran\u00e7ais)
+[English](#english) | [Fran\u00e7ais](#français)
 
 ---
 
