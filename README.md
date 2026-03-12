@@ -1,224 +1,221 @@
-# Knowledge Base MCP Server
+# 📚 Biblium
 
-[![smithery badge](https://smithery.ai/badge/@jeanibarz/knowledge-base-mcp-server)](https://smithery.ai/server/@jeanibarz/knowledge-base-mcp-server)
-This MCP server provides tools for listing and retrieving content from different knowledge bases.
+**Your AI's personal library.** A knowledge base server that gives Claude (or any MCP client) the ability to store, search, and retrieve documents — organized into collections you control.
 
-<a href="https://glama.ai/mcp/servers/n0p6v0o0a4">
-  <img width="380" height="200" src="https://glama.ai/mcp/servers/n0p6v0o0a4/badge" alt="Knowledge Base Server MCP server" />
-</a>
-
-## Setup Instructions
-
-These instructions assume you have Node.js and npm installed on your system.
-
-### Installing via Smithery
-
-To install Knowledge Base Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@jeanibarz/knowledge-base-mcp-server):
-
-```bash
-npx -y @smithery/cli install @jeanibarz/knowledge-base-mcp-server --client claude
-```
-
-### Manual Installation
-**Prerequisites**
-
-*   [Node.js](https://nodejs.org/) (version 16 or higher)
-*   [npm](https://www.npmjs.com/) (Node Package Manager)
-
-1.  **Clone the repository:**
-
-    ```bash
-    git clone <repository_url>
-    cd knowledge-base-mcp-server
-    ```
-
-2.  **Install dependencies:**
-
-    ```bash
-    npm install
-    ```
-
-3.  **Configure environment variables:**
-
-    This server supports three embedding providers: **Ollama** (recommended for reliability), **OpenAI** and **HuggingFace** (fallback option).
-
-    ### Option 1: Ollama Configuration (Recommended)
-    
-    *   Set `EMBEDDING_PROVIDER=ollama` to use local Ollama embeddings
-    *   Install [Ollama](https://ollama.ai/) and pull an embedding model: `ollama pull dengcao/Qwen3-Embedding-0.6B:Q8_0`
-    *   Configure the following environment variables:
-        ```bash
-        EMBEDDING_PROVIDER=ollama
-        OLLAMA_BASE_URL=http://localhost:11434  # Default Ollama URL
-        OLLAMA_MODEL=dengcao/Qwen3-Embedding-0.6B:Q8_0          # Default embedding model
-        KNOWLEDGE_BASES_ROOT_DIR=$HOME/knowledge_bases
-        ```
-
-    ### Option 2: OpenAI Configuration
-
-    *   Set `EMBEDDING_PROVIDER=openai` to use OpenAI API for embeddings
-    *   Configure the following environment variables:
-        ```bash
-        EMBEDDING_PROVIDER=openai
-        OPENAI_API_KEY=your_api_key_here
-        OPENAI_MODEL_NAME=text-embedding-ada-002
-        KNOWLEDGE_BASES_ROOT_DIR=$HOME/knowledge_bases
-        ```
-
-    ### Option 3: HuggingFace Configuration (Fallback)
-    
-    *   Set `EMBEDDING_PROVIDER=huggingface` or leave unset (default)
-    *   Obtain a free API key from [HuggingFace](https://huggingface.co/)
-    *   Configure the following environment variables:
-        ```bash
-        EMBEDDING_PROVIDER=huggingface          # Optional, this is the default
-        HUGGINGFACE_API_KEY=your_api_key_here
-        HUGGINGFACE_MODEL_NAME=sentence-transformers/all-MiniLM-L6-v2
-        KNOWLEDGE_BASES_ROOT_DIR=$HOME/knowledge_bases
-        ```
-
-    ### Additional Configuration
-    
-    *   The server supports the `FAISS_INDEX_PATH` environment variable to specify the path to the FAISS index. If not set, it will default to `$HOME/knowledge_bases/.faiss`.
-    *   Logging can be routed to a file by setting `LOG_FILE=/path/to/logs/knowledge-base.log`. Log verbosity defaults to `info` and can be adjusted with `LOG_LEVEL=debug|info|warn|error`.
-    *   You can set these environment variables in your `.bashrc` or `.zshrc` file, or directly in the MCP settings.
-
-4.  **Build the server:**
-
-    ```bash
-    npm run build
-    ```
-
-5.  **Add the server to the MCP settings:**
-
-    *   Edit the `cline_mcp_settings.json` file located at `/home/jean/.vscode-server/data/User/globalStorage/saoudrizwan.claude-dev/settings/`.
-    *   Add the following configuration to the `mcpServers` object:
-
-    *   **Option 1: Ollama Configuration**
-
-    ```json
-    "knowledge-base-mcp-ollama": {
-      "command": "node",
-      "args": [
-        "/path/to/knowledge-base-mcp-server/build/index.js"
-      ],
-      "disabled": false,
-      "autoApprove": [],
-      "env": {
-        "KNOWLEDGE_BASES_ROOT_DIR": "/path/to/knowledge_bases",
-        "EMBEDDING_PROVIDER": "ollama",
-        "OLLAMA_BASE_URL": "http://localhost:11434",
-        "OLLAMA_MODEL": "dengcao/Qwen3-Embedding-0.6B:Q8_0"
-      },
-      "description": "Retrieves similar chunks from the knowledge base based on a query using Ollama."
-    },
-    ```
-
-    *   **Option 2: OpenAI Configuration**
-
-    ```json
-    "knowledge-base-mcp-openai": {
-      "command": "node",
-      "args": [
-        "/path/to/knowledge-base-mcp-server/build/index.js"
-      ],
-      "disabled": false,
-      "autoApprove": [],
-      "env": {
-        "KNOWLEDGE_BASES_ROOT_DIR": "/path/to/knowledge_bases",
-        "EMBEDDING_PROVIDER": "openai",
-        "OPENAI_API_KEY": "YOUR_OPENAI_API_KEY",
-        "OPENAI_MODEL_NAME": "text-embedding-ada-002"
-      },
-      "description": "Retrieves similar chunks from the knowledge base based on a query using OpenAI."
-    },
-    ```
-
-    *   **Option 3: HuggingFace Configuration**
-
-    ```json
-    "knowledge-base-mcp-huggingface": {
-      "command": "node",
-      "args": [
-        "/path/to/knowledge-base-mcp-server/build/index.js"
-      ],
-      "disabled": false,
-      "autoApprove": [],
-      "env": {
-        "KNOWLEDGE_BASES_ROOT_DIR": "/path/to/knowledge_bases",
-        "EMBEDDING_PROVIDER": "huggingface",
-        "HUGGINGFACE_API_KEY": "YOUR_HUGGINGFACE_API_KEY",
-        "HUGGINGFACE_MODEL_NAME": "sentence-transformers/all-MiniLM-L6-v2"
-      },
-      "description": "Retrieves similar chunks from the knowledge base based on a query using HuggingFace."
-    },
-    ```
-
-    *   **Note:** You only need to add one of the above configurations (either Ollama, OpenAI or HuggingFace) to your `cline_mcp_settings.json` file, depending on your preferred embedding provider.
-    ```
-
-    *   Replace `/path/to/knowledge-base-mcp-server` with the actual path to the server directory.
-    *   Replace `/path/to/knowledge_bases` with the actual path to the knowledge bases directory.
-
-6.  **Create knowledge base directories:**
-
-    *   Create subdirectories within the `KNOWLEDGE_BASES_ROOT_DIR` for each knowledge base (e.g., `company`, `it_support`, `onboarding`).
-    *   Place text files (e.g., `.txt`, `.md`) containing the knowledge base content within these subdirectories.
-
-*   The server recursively reads all text files (e.g., `.txt`, `.md`) within the specified knowledge base subdirectories.
-*   The server skips hidden files and directories (those starting with a `.`).
-*   For each file, the server calculates the SHA256 hash and stores it in a file with the same name in a hidden `.index` subdirectory. This hash is used to determine if the file has been modified since the last indexing.
-*   The file content is splitted into chunks using the `MarkdownTextSplitter` from `langchain/text_splitter`.
-*   The content of each chunk is then added to a FAISS index, which is used for similarity search.
-*   The FAISS index is automatically initialized when the server starts. It checks for changes in the knowledge base files and updates the index accordingly.
-
-## Usage
-
-The server exposes two tools:
-
-*   `list_knowledge_bases`: Lists the available knowledge bases.
-*   `retrieve_knowledge`: Retrieves similar chunks from the knowledge base based on a query. Optionally, if a knowledge base is specified, only that one is searched; otherwise, all available knowledge bases are considered. By default, at most 10 document chunks are returned with a score below a threshold of 2. A different threshold can optionally be provided using the `threshold` parameter.
-
-You can use these tools through the MCP interface.
-
-The `retrieve_knowledge` tool performs a semantic search using a FAISS index. The index is automatically updated when the server starts or when a file in a knowledge base is modified.
-
-The output of the `retrieve_knowledge` tool is a markdown formatted string with the following structure:
-
-````markdown
-## Semantic Search Results
-
-**Result 1:**
-
-[Content of the most similar chunk]
-
-**Source:**
-```json
-{
-  "source": "[Path to the file containing the chunk]"
-}
-```
+🇬🇧 [English](#-why-biblium) | 🇫🇷 [Français](#-pourquoi-biblium)
 
 ---
 
-**Result 2:**
+## 🇬🇧 Why Biblium?
 
-[Content of the second most similar chunk]
+LLMs are powerful but stateless. Biblium gives them **persistent, searchable memory** through the [Model Context Protocol](https://modelcontextprotocol.io/).
 
-**Source:**
+Drop documentation, notes, or any text into named collections. Biblium indexes everything with BM25 ranking and makes it instantly searchable by your AI assistant.
+
+### What makes it different
+
+- **Single binary, zero dependencies** — Pure Go, no CGO, no Python, no Docker. Just copy and run.
+- **Works offline** — No cloud service, no API keys. Your data stays on your machine.
+- **URL ingestion with approval** — Suggest web pages to add; they're fetched and converted to markdown only after you approve.
+- **~17 MB binary, ~2600 lines of Go** — Small, auditable, maintainable.
+
+### Quick start
+
+```bash
+# Build
+go build -o biblium ./cmd/biblium
+
+# Run (starts MCP stdio server)
+BIBLIUM_DATA_DIR=./my-knowledge biblium
+```
+
+Add to **Claude Desktop** (`claude_desktop_config.json`):
+
 ```json
 {
-  "source": "[Path to the file containing the chunk]"
+  "mcpServers": {
+    "biblium": {
+      "command": "/path/to/biblium",
+      "env": {
+        "BIBLIUM_DATA_DIR": "/path/to/data"
+      }
+    }
+  }
 }
 ```
 
-> **Disclaimer:** The provided results might not all be relevant. Please cross-check the relevance of the information.
-````
+Multiple instances with separate data directories:
 
-Each result includes the content of the most similar chunk, the source file, and a similarity score.
+```json
+{
+  "mcpServers": {
+    "biblium-infra": {
+      "command": "/path/to/biblium",
+      "env": { "BIBLIUM_DATA_DIR": "/data/infra-docs" }
+    },
+    "biblium-dev": {
+      "command": "/path/to/biblium",
+      "env": { "BIBLIUM_DATA_DIR": "/data/dev-docs" }
+    }
+  }
+}
+```
 
-## Troubleshooting & Logging
+Then ask Claude: *"Create a collection called 'golang' and add my notes about error handling."*
 
-- Set `LOG_FILE` to capture structured logs (JSON-RPC traffic continues to use stdout). This is especially helpful when diagnosing MCP handshake errors because all diagnostic messages are written to stderr and the optional log file.
-- Permission errors when creating or updating the FAISS index are surfaced with explicit messages in both the console and the log file. Verify that the process can write to `FAISS_INDEX_PATH` and the `.index` directories inside each knowledge base.
-- Run `npm test` to execute the Jest suite (serialised with `--runInBand`) that covers logger fallback behaviour and FAISS permission handling.
+### MCP Tools
+
+| Tool | What it does |
+|------|-------------|
+| `create_collection` | Create a new knowledge collection |
+| `list_collections` | List all collections |
+| `add_document` | Add a document to a collection |
+| `list_documents` | List documents in a collection |
+| `read_document` | Read a document's content |
+| `search` | Full-text search across all collections (BM25) |
+| `suggest_url` | Suggest a URL for ingestion (requires approval) |
+| `approve_url` | Approve and fetch a pending URL as markdown |
+| `list_pending` | List all pending URL suggestions |
+
+### How it works
+
+```mermaid
+graph TD
+    A[Claude / MCP Client] -->|stdio JSON-RPC| B[Biblium]
+    B --> C[FileStore<br/>docs/]
+    B --> D[SQLite<br/>pending URLs]
+    C --> E[BM25 Index<br/>in-memory]
+```
+
+Collections live as directories on disk. Documents are plain text files. The BM25 index rebuilds from disk on startup — no separate database for search.
+
+### Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `BIBLIUM_DATA_DIR` | `~/biblium_data` | Where collections are stored |
+| `BIBLIUM_SEARCH_BACKEND` | `bm25` | Search engine (`bm25` or `ollama`) |
+| `BIBLIUM_LOG_LEVEL` | `info` | Log verbosity |
+
+### Cross-compilation
+
+No CGO means easy cross-compilation for any platform:
+
+```bash
+GOOS=linux   GOARCH=amd64 go build -o biblium ./cmd/biblium
+GOOS=linux   GOARCH=arm64 go build -o biblium ./cmd/biblium
+GOOS=darwin  GOARCH=arm64 go build -o biblium ./cmd/biblium
+GOOS=netbsd  GOARCH=amd64 go build -o biblium ./cmd/biblium
+```
+
+### License
+
+[EUPL-1.2-or-later](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12) — Free and open source, compatible with GPL, AGPL, MPL.
+
+---
+
+## 🇫🇷 Pourquoi Biblium ?
+
+Les LLMs sont puissants mais sans mémoire. Biblium leur donne une **mémoire persistante et cherchable** via le [Model Context Protocol](https://modelcontextprotocol.io/).
+
+Déposez de la documentation, des notes ou du texte dans des collections nommées. Biblium indexe tout avec un classement BM25 et rend le contenu instantanément accessible à votre assistant IA.
+
+### Ce qui le distingue
+
+- **Un seul binaire, zéro dépendance** — Go pur, pas de CGO, pas de Python, pas de Docker. Copier et lancer.
+- **Fonctionne hors ligne** — Aucun service cloud, aucune clé API. Vos données restent sur votre machine.
+- **Ingestion d'URL avec approbation** — Proposez des pages web ; elles sont récupérées en markdown uniquement après validation.
+- **~17 Mo, ~2600 lignes de Go** — Petit, auditable, maintenable.
+
+### Démarrage rapide
+
+```bash
+# Compiler
+go build -o biblium ./cmd/biblium
+
+# Lancer (serveur MCP stdio)
+BIBLIUM_DATA_DIR=./mes-connaissances biblium
+```
+
+Ajouter dans **Claude Desktop** (`claude_desktop_config.json`) :
+
+```json
+{
+  "mcpServers": {
+    "biblium": {
+      "command": "/chemin/vers/biblium",
+      "env": {
+        "BIBLIUM_DATA_DIR": "/chemin/vers/data"
+      }
+    }
+  }
+}
+```
+
+Plusieurs instances avec des répertoires séparés :
+
+```json
+{
+  "mcpServers": {
+    "biblium-infra": {
+      "command": "/chemin/vers/biblium",
+      "env": { "BIBLIUM_DATA_DIR": "/data/docs-infra" }
+    },
+    "biblium-dev": {
+      "command": "/chemin/vers/biblium",
+      "env": { "BIBLIUM_DATA_DIR": "/data/docs-dev" }
+    }
+  }
+}
+```
+
+Puis demandez à Claude : *« Crée une collection 'golang' et ajoute mes notes sur la gestion d'erreurs. »*
+
+### Outils MCP
+
+| Outil | Fonction |
+|-------|----------|
+| `create_collection` | Créer une nouvelle collection |
+| `list_collections` | Lister toutes les collections |
+| `add_document` | Ajouter un document à une collection |
+| `list_documents` | Lister les documents d'une collection |
+| `read_document` | Lire le contenu d'un document |
+| `search` | Recherche plein texte sur toutes les collections (BM25) |
+| `suggest_url` | Proposer une URL à ingérer (approbation requise) |
+| `approve_url` | Approuver et récupérer une URL en markdown |
+| `list_pending` | Lister les URLs en attente |
+
+### Architecture
+
+```mermaid
+graph TD
+    A[Claude / Client MCP] -->|stdio JSON-RPC| B[Biblium]
+    B --> C[FileStore<br/>docs/]
+    B --> D[SQLite<br/>URLs en attente]
+    C --> E[Index BM25<br/>en mémoire]
+```
+
+Les collections sont des répertoires sur disque. Les documents sont des fichiers texte. L'index BM25 se reconstruit au démarrage — pas de base séparée pour la recherche.
+
+### Configuration
+
+| Variable | Défaut | Description |
+|----------|--------|-------------|
+| `BIBLIUM_DATA_DIR` | `~/biblium_data` | Répertoire de stockage |
+| `BIBLIUM_SEARCH_BACKEND` | `bm25` | Moteur de recherche (`bm25` ou `ollama`) |
+| `BIBLIUM_LOG_LEVEL` | `info` | Niveau de log |
+
+### Cross-compilation
+
+Aucun CGO — compilation croisée pour toute plateforme :
+
+```bash
+GOOS=linux   GOARCH=amd64 go build -o biblium ./cmd/biblium
+GOOS=linux   GOARCH=arm64 go build -o biblium ./cmd/biblium
+GOOS=darwin  GOARCH=arm64 go build -o biblium ./cmd/biblium
+GOOS=netbsd  GOARCH=amd64 go build -o biblium ./cmd/biblium
+```
+
+### Licence
+
+[EUPL-1.2-ou-ultérieure](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12) — Libre et open source, compatible GPL, AGPL, MPL.
