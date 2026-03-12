@@ -13,14 +13,18 @@ import (
 	"github.com/mark3labs/mcp-go/server"
 
 	"github.com/mipsou/lore-mcp/internal/corpus"
+	"github.com/mipsou/lore-mcp/internal/ingest"
+	"github.com/mipsou/lore-mcp/internal/pending"
 	"github.com/mipsou/lore-mcp/internal/search"
 )
 
 // Server wraps the MCP server with Lore-specific configuration.
 type Server struct {
-	mcp    *server.MCPServer
-	store  *corpus.FileStore
-	search search.Searcher
+	mcp     *server.MCPServer
+	store   *corpus.FileStore
+	search  search.Searcher
+	pending *pending.Queue
+	fetcher *ingest.Fetcher
 }
 
 // New creates a new Lore MCP server with all tools registered.
@@ -32,9 +36,11 @@ func New(store *corpus.FileStore, searcher search.Searcher) *Server {
 	)
 
 	srv := &Server{
-		mcp:    s,
-		store:  store,
-		search: searcher,
+		mcp:     s,
+		store:   store,
+		search:  searcher,
+		pending: pending.NewQueue(),
+		fetcher: ingest.NewFetcher(),
 	}
 	srv.registerTools()
 
@@ -97,5 +103,29 @@ func (s *Server) registerTools() {
 			mcp.WithNumber("max_results", mcp.Description("Maximum results to return")),
 		),
 		s.handleSearch,
+	)
+
+	s.mcp.AddTool(
+		mcp.NewTool("suggest_url",
+			mcp.WithDescription("Suggest a URL for ingestion into a corpus (requires approval)"),
+			mcp.WithString("corpus", mcp.Required(), mcp.Description("Target corpus name")),
+			mcp.WithString("url", mcp.Required(), mcp.Description("URL to ingest")),
+		),
+		s.handleSuggestURL,
+	)
+
+	s.mcp.AddTool(
+		mcp.NewTool("approve_url",
+			mcp.WithDescription("Approve a pending URL for ingestion"),
+			mcp.WithString("id", mcp.Required(), mcp.Description("Pending entry ID")),
+		),
+		s.handleApproveURL,
+	)
+
+	s.mcp.AddTool(
+		mcp.NewTool("list_pending",
+			mcp.WithDescription("List all pending URL suggestions"),
+		),
+		s.handleListPending,
 	)
 }

@@ -128,3 +128,87 @@ func (s *Server) handleSearch(_ context.Context, req mcp.CallToolRequest) (*mcp.
 
 	return mcp.NewToolResultText(string(out)), nil
 }
+
+func (s *Server) handleSuggestURL(_ context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	corpusName, err := req.RequireString("corpus")
+	if err != nil {
+		return mcp.NewToolResultError("missing required parameter: corpus"), nil
+	}
+	rawURL, err := req.RequireString("url")
+	if err != nil {
+		return mcp.NewToolResultError("missing required parameter: url"), nil
+	}
+
+	entry, err := s.pending.Add(corpusName, rawURL)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("error adding to pending: %v", err)), nil
+	}
+
+	out, err := json.MarshalIndent(entry, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("error formatting entry: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(out)), nil
+}
+
+func (s *Server) handleApproveURL(_ context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	id, err := req.RequireString("id")
+	if err != nil {
+		return mcp.NewToolResultError("missing required parameter: id"), nil
+	}
+
+	entry, err := s.pending.Approve(id)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("error approving: %v", err)), nil
+	}
+
+	// Fetch the URL and ingest into the corpus.
+	md, err := s.fetcher.Fetch(entry.URL)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("error fetching URL: %v", err)), nil
+	}
+
+	// Generate a document name from the URL.
+	docName := sanitizeDocName(entry.URL)
+
+	if err := s.store.AddDoc(entry.Corpus, docName, []byte(md)); err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("error storing document: %v", err)), nil
+	}
+
+	if err := s.search.Index(entry.Corpus, docName, md); err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("error indexing document: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(fmt.Sprintf("approved and ingested %q as %q in corpus %q", entry.URL, docName, entry.Corpus)), nil
+}
+
+func (s *Server) handleListPending(_ context.Context, _ mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	entries := s.pending.List()
+	if len(entries) == 0 {
+		return mcp.NewToolResultText("no pending entries"), nil
+	}
+
+	out, err := json.MarshalIndent(entries, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("error formatting entries: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(out)), nil
+}
+
+// sanitizeDocName converts a URL to a safe document filename.
+func sanitizeDocName(rawURL string) string {
+	name := rawURL
+	// Remove scheme.
+	for _, prefix := range []string{"https://", "http://"} {
+		name = strings.TrimPrefix(name, prefix)
+	}
+	// Replace unsafe characters.
+	replacer := strings.NewReplacer("/", "_", "?", "_", "&", "_", "=", "_", "#", "_", ":", "_")
+	name = replacer.Replace(name)
+	if !strings.HasSuffix(name, ".md") {
+		name += ".md"
+	}
+	return name
+}

@@ -61,7 +61,7 @@ func TestServerRegistersTools(t *testing.T) {
 		t.Fatalf("failed to parse response: %v", err)
 	}
 
-	// Expect these 6 core tools to be registered.
+	// Expect all 9 tools to be registered.
 	expectedTools := []string{
 		"create_corpus",
 		"list_corpora",
@@ -69,6 +69,9 @@ func TestServerRegistersTools(t *testing.T) {
 		"list_documents",
 		"read_document",
 		"search",
+		"suggest_url",
+		"approve_url",
+		"list_pending",
 	}
 	toolMap := make(map[string]bool)
 	for _, tool := range resp.Result.Tools {
