@@ -60,11 +60,18 @@ func (d *DB) migrate() error {
 		CREATE TABLE IF NOT EXISTS pending_urls (
 			id         TEXT PRIMARY KEY,
 			url        TEXT NOT NULL,
-			corpus     TEXT NOT NULL,
+			collection TEXT NOT NULL,
 			status     TEXT NOT NULL DEFAULT 'pending',
 			created_at TEXT NOT NULL DEFAULT (datetime('now')),
 			updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 		)
 	`)
-	return err
+	if err != nil {
+		return err
+	}
+
+	// Migrate old "corpus" column to "collection" if needed.
+	d.db.Exec(`ALTER TABLE pending_urls RENAME COLUMN corpus TO collection`)
+
+	return nil
 }

@@ -38,8 +38,8 @@ func TestPendingAdd(t *testing.T) {
 	if entry.URL != "https://example.com/doc" {
 		t.Errorf("URL = %q, want %q", entry.URL, "https://example.com/doc")
 	}
-	if entry.Corpus != "infra" {
-		t.Errorf("Corpus = %q, want %q", entry.Corpus, "infra")
+	if entry.Collection != "infra" {
+		t.Errorf("Collection = %q, want %q", entry.Collection, "infra")
 	}
 	if entry.Status != pending.StatusPending {
 		t.Errorf("Status = %q, want %q", entry.Status, pending.StatusPending)

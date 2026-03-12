@@ -13,16 +13,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mipsou/mcp-biblium/internal/corpus"
+	"github.com/mipsou/mcp-biblium/internal/filestore"
 	"github.com/mipsou/mcp-biblium/internal/search"
 	"github.com/mipsou/mcp-biblium/internal/storage"
 )
 
 // TestIntegrationFullWorkflow tests the complete workflow:
-// create corpus → add documents → search → read document.
+// create collection → add documents → search → read document.
 func TestIntegrationFullWorkflow(t *testing.T) {
 	root := t.TempDir()
-	store := corpus.NewFileStore(root)
+	store := filestore.New(root)
 	bm25 := search.NewBM25()
 	db, err := storage.Open(filepath.Join(root, "biblium.db"))
 	if err != nil {
@@ -31,37 +31,37 @@ func TestIntegrationFullWorkflow(t *testing.T) {
 	defer db.Close()
 	s := New(store, bm25, db)
 
-	// 1. Create a corpus.
-	text := callTool(t, s, "create_corpus", map[string]any{"name": "homelab"})
+	// 1. Create a filestore.
+	text := callTool(t, s, "create_collection", map[string]any{"name": "homelab"})
 	if !strings.Contains(text, "homelab") {
-		t.Fatalf("create_corpus: %s", text)
+		t.Fatalf("create_collection: %s", text)
 	}
 
 	// 2. Add documents.
 	callTool(t, s, "add_document", map[string]any{
-		"corpus":  "homelab",
+		  "collection":  "homelab",
 		"name":    "caddy.md",
 		"content": "Caddy is a modern web server with automatic HTTPS using Let's Encrypt certificates",
 	})
 	callTool(t, s, "add_document", map[string]any{
-		"corpus":  "homelab",
+		  "collection":  "homelab",
 		"name":    "pihole.md",
 		"content": "Pi-hole is a DNS sinkhole that blocks ads and trackers at the network level",
 	})
 	callTool(t, s, "add_document", map[string]any{
-		"corpus":  "homelab",
+		  "collection":  "homelab",
 		"name":    "unbound.md",
 		"content": "Unbound is a recursive DNS resolver that provides privacy and validation",
 	})
 
-	// 3. List corpus entries.
-	text = callTool(t, s, "list_corpus", nil)
+	// 3. List collection entries.
+	text = callTool(t, s, "list_collections", nil)
 	if !strings.Contains(text, "homelab") {
-		t.Fatalf("list_corpus: %s", text)
+		t.Fatalf("list_collections: %s", text)
 	}
 
 	// 4. List documents.
-	text = callTool(t, s, "list_documents", map[string]any{"corpus": "homelab"})
+	text = callTool(t, s, "list_documents", map[string]any{  "collection": "homelab"})
 	if !strings.Contains(text, "caddy.md") || !strings.Contains(text, "pihole.md") {
 		t.Fatalf("list_documents: %s", text)
 	}
@@ -77,7 +77,7 @@ func TestIntegrationFullWorkflow(t *testing.T) {
 
 	// 6. Read a specific document.
 	text = callTool(t, s, "read_document", map[string]any{
-		"corpus": "homelab",
+		  "collection": "homelab",
 		"name":   "caddy.md",
 	})
 	if !strings.Contains(text, "Caddy") || !strings.Contains(text, "HTTPS") {
@@ -86,7 +86,7 @@ func TestIntegrationFullWorkflow(t *testing.T) {
 
 	// 7. Suggest URL (pending workflow).
 	text = callTool(t, s, "suggest_url", map[string]any{
-		"corpus": "homelab",
+		  "collection": "homelab",
 		"url":    "https://example.com/docs/coreos",
 	})
 	if !strings.Contains(text, "pending") {
@@ -104,7 +104,7 @@ func TestIntegrationFullWorkflow(t *testing.T) {
 // add docs → "restart" (new BM25 rebuilt from disk) → search still works.
 func TestPersistenceSurvivesRestart(t *testing.T) {
 	root := t.TempDir()
-	store := corpus.NewFileStore(root)
+	store := filestore.New(root)
 	dbPath := filepath.Join(root, "biblium.db")
 
 	// --- Session 1: add documents + suggest URL ---
@@ -115,19 +115,19 @@ func TestPersistenceSurvivesRestart(t *testing.T) {
 	}
 	s1 := New(store, bm25, db1)
 
-	callTool(t, s1, "create_corpus", map[string]any{"name": "infra"})
+	callTool(t, s1, "create_collection", map[string]any{"name": "infra"})
 	callTool(t, s1, "add_document", map[string]any{
-		"corpus":  "infra",
+		  "collection":  "infra",
 		"name":    "caddy.md",
 		"content": "Caddy is a web server with automatic HTTPS",
 	})
 	callTool(t, s1, "add_document", map[string]any{
-		"corpus":  "infra",
+		  "collection":  "infra",
 		"name":    "pihole.md",
 		"content": "Pi-hole blocks ads at DNS level",
 	})
 	callTool(t, s1, "suggest_url", map[string]any{
-		"corpus": "infra",
+		  "collection": "infra",
 		"url":    "https://example.com/persist-test",
 	})
 	db1.Close()

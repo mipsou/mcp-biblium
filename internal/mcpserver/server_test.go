@@ -15,7 +15,7 @@ import (
 
 	"path/filepath"
 
-	"github.com/mipsou/mcp-biblium/internal/corpus"
+	"github.com/mipsou/mcp-biblium/internal/filestore"
 	"github.com/mipsou/mcp-biblium/internal/search"
 	"github.com/mipsou/mcp-biblium/internal/storage"
 )
@@ -23,7 +23,7 @@ import (
 func newTestServer(t *testing.T) *Server {
 	t.Helper()
 	root := t.TempDir()
-	store := corpus.NewFileStore(root)
+	store := filestore.New(root)
 	searcher := search.NewBM25()
 	db, err := storage.Open(filepath.Join(root, "biblium.db"))
 	if err != nil {
@@ -71,8 +71,8 @@ func TestServerRegistersTools(t *testing.T) {
 
 	// Expect all 9 tools to be registered.
 	expectedTools := []string{
-		"create_corpus",
-		"list_corpus",
+		"create_collection",
+		"list_collections",
 		"add_document",
 		"list_documents",
 		"read_document",

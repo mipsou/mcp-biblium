@@ -6,7 +6,7 @@
  * https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  */
 
-package corpus
+package filestore
 
 import (
 	"os"
@@ -15,19 +15,19 @@ import (
 	"github.com/mipsou/mcp-biblium/internal/safepath"
 )
 
-// FileStore manages corpus entries on the filesystem.
-// Each corpus is a directory under root containing a docs/ subdirectory.
-type FileStore struct {
+// Store manages collections on the filesystem.
+// Each collection is a directory under root containing a docs/ subdirectory.
+type Store struct {
 	root string
 }
 
-// NewFileStore creates a store rooted at the given directory.
-func NewFileStore(root string) *FileStore {
-	return &FileStore{root: root}
+// New creates a store rooted at the given directory.
+func New(root string) *Store {
+	return &Store{root: root}
 }
 
-// List returns the names of all corpus entries.
-func (s *FileStore) List() ([]string, error) {
+// List returns the names of all collections.
+func (s *Store) List() ([]string, error) {
 	entries, err := os.ReadDir(s.root)
 	if os.IsNotExist(err) {
 		return nil, nil
@@ -44,8 +44,8 @@ func (s *FileStore) List() ([]string, error) {
 	return names, nil
 }
 
-// Create initializes a new corpus directory with a docs/ subdirectory.
-func (s *FileStore) Create(name string) error {
+// Create initializes a new collection directory with a docs/ subdirectory.
+func (s *Store) Create(name string) error {
 	_, err := safepath.Resolve(s.root, name)
 	if err != nil {
 		return err
@@ -54,13 +54,13 @@ func (s *FileStore) Create(name string) error {
 	return os.MkdirAll(docsDir, 0o755)
 }
 
-// ListDocs returns the filenames of all documents in a corpus.
-func (s *FileStore) ListDocs(corpus string) ([]string, error) {
-	_, err := safepath.Resolve(s.root, corpus)
+// ListDocs returns the filenames of all documents in a collection.
+func (s *Store) ListDocs(collection string) ([]string, error) {
+	_, err := safepath.Resolve(s.root, collection)
 	if err != nil {
 		return nil, err
 	}
-	docsDir := filepath.Join(s.root, corpus, "docs")
+	docsDir := filepath.Join(s.root, collection, "docs")
 	entries, err := os.ReadDir(docsDir)
 	if os.IsNotExist(err) {
 		return nil, nil
@@ -77,28 +77,28 @@ func (s *FileStore) ListDocs(corpus string) ([]string, error) {
 	return names, nil
 }
 
-// AddDoc writes a document file to a corpus.
-func (s *FileStore) AddDoc(corpus, name string, data []byte) error {
-	corpusPath := filepath.Join(s.root, corpus, "docs")
-	resolved, err := safepath.Resolve(corpusPath, name)
+// AddDoc writes a document file to a collection.
+func (s *Store) AddDoc(collection, name string, data []byte) error {
+	collPath := filepath.Join(s.root, collection, "docs")
+	resolved, err := safepath.Resolve(collPath, name)
 	if err != nil {
 		return err
 	}
 	return os.WriteFile(resolved, data, 0o644)
 }
 
-// ReadDoc reads a document from a corpus.
-func (s *FileStore) ReadDoc(corpus, name string) ([]byte, error) {
-	corpusPath := filepath.Join(s.root, corpus, "docs")
-	resolved, err := safepath.Resolve(corpusPath, name)
+// ReadDoc reads a document from a collection.
+func (s *Store) ReadDoc(collection, name string) ([]byte, error) {
+	collPath := filepath.Join(s.root, collection, "docs")
+	resolved, err := safepath.Resolve(collPath, name)
 	if err != nil {
 		return nil, err
 	}
 	return os.ReadFile(resolved)
 }
 
-// Walk iterates over all documents in every corpus, calling fn for each.
-func (s *FileStore) Walk(fn func(corpus, docName, content string) error) error {
+// Walk iterates over all documents in every collection, calling fn for each.
+func (s *Store) Walk(fn func(collection, docName, content string) error) error {
 	names, err := s.List()
 	if err != nil {
 		return err
