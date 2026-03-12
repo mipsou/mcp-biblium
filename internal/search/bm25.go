@@ -21,9 +21,9 @@ const (
 	bm25B  = 0.75
 )
 
-// docKey uniquely identifies a document across corpus entries.
+// docKey uniquely identifies a document across collections.
 type docKey struct {
-	corpus  string
+	collection  string
 	docName string
 }
 
@@ -83,8 +83,8 @@ func termFrequencies(tokens []string) map[string]int {
 }
 
 // Index processes a document and adds it to the search index.
-func (b *BM25) Index(corpus, docName, content string) error {
-	key := docKey{corpus: corpus, docName: docName}
+func (b *BM25) Index(collection, docName, content string) error {
+	key := docKey{collection: collection, docName: docName}
 	tokens := tokenize(content)
 	tf := termFrequencies(tokens)
 
@@ -118,8 +118,8 @@ func (b *BM25) Index(corpus, docName, content string) error {
 }
 
 // Remove removes a document from the index.
-func (b *BM25) Remove(corpus, docName string) error {
-	key := docKey{corpus: corpus, docName: docName}
+func (b *BM25) Remove(collection, docName string) error {
+	key := docKey{collection: collection, docName: docName}
 
 	b.mu.Lock()
 	defer b.mu.Unlock()
@@ -208,7 +208,7 @@ func (b *BM25) Search(query string, maxResults int) ([]Result, error) {
 			snippet = snippet[:200]
 		}
 		out[i] = Result{
-			Corpus:  r.key.corpus,
+			Collection:  r.key.collection,
 			DocName: r.key.docName,
 			Score:   r.score,
 			Snippet: snippet,

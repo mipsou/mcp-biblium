@@ -16,11 +16,11 @@ import (
 )
 
 // PendingAdd inserts a new pending URL and returns the entry.
-func (d *DB) PendingAdd(corpus, rawURL string) (*pending.Entry, error) {
+func (d *DB) PendingAdd(collection, rawURL string) (*pending.Entry, error) {
 	id := uuid.New().String()
 	_, err := d.db.Exec(
-		`INSERT INTO pending_urls (id, url, corpus, status) VALUES (?, ?, ?, ?)`,
-		id, rawURL, corpus, string(pending.StatusPending),
+		`INSERT INTO pending_urls (id, url, collection, status) VALUES (?, ?, ?, ?)`,
+		id, rawURL, collection, string(pending.StatusPending),
 	)
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func (d *DB) PendingAdd(corpus, rawURL string) (*pending.Entry, error) {
 	return &pending.Entry{
 		ID:     id,
 		URL:    rawURL,
-		Corpus: corpus,
+		Collection: collection,
 		Status: pending.StatusPending,
 	}, nil
 }
@@ -36,7 +36,7 @@ func (d *DB) PendingAdd(corpus, rawURL string) (*pending.Entry, error) {
 // PendingList returns all pending entries.
 func (d *DB) PendingList() ([]*pending.Entry, error) {
 	rows, err := d.db.Query(
-		`SELECT id, url, corpus, status FROM pending_urls ORDER BY created_at`,
+		`SELECT id, url, collection, status FROM pending_urls ORDER BY created_at`,
 	)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (d *DB) PendingList() ([]*pending.Entry, error) {
 	for rows.Next() {
 		var e pending.Entry
 		var status string
-		if err := rows.Scan(&e.ID, &e.URL, &e.Corpus, &status); err != nil {
+		if err := rows.Scan(&e.ID, &e.URL, &e.Collection, &status); err != nil {
 			return nil, err
 		}
 		e.Status = pending.Status(status)
@@ -82,8 +82,8 @@ func (d *DB) pendingSetStatus(id string, status pending.Status) (*pending.Entry,
 	var e pending.Entry
 	var s string
 	err = d.db.QueryRow(
-		`SELECT id, url, corpus, status FROM pending_urls WHERE id = ?`, id,
-	).Scan(&e.ID, &e.URL, &e.Corpus, &s)
+		`SELECT id, url, collection, status FROM pending_urls WHERE id = ?`, id,
+	).Scan(&e.ID, &e.URL, &e.Collection, &s)
 	if err != nil {
 		return nil, err
 	}

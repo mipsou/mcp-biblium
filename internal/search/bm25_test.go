@@ -89,7 +89,7 @@ func TestBM25Remove(t *testing.T) {
 	}
 }
 
-func TestBM25SearchAcrossCorpus(t *testing.T) {
+func TestBM25SearchAcrossCollections(t *testing.T) {
 	b := NewBM25()
 	_ = b.Index("infra", "caddy.md", "Caddy web server HTTPS")
 	_ = b.Index("podman", "basics.md", "Podman container basics")
@@ -99,7 +99,7 @@ func TestBM25SearchAcrossCorpus(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if len(results) == 0 {
-		t.Fatal("expected cross-corpus results")
+		t.Fatal("expected cross-collection results")
 	}
 }
 

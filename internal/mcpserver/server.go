@@ -12,7 +12,7 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 
-	"github.com/mipsou/mcp-biblium/internal/corpus"
+	"github.com/mipsou/mcp-biblium/internal/filestore"
 	"github.com/mipsou/mcp-biblium/internal/ingest"
 	"github.com/mipsou/mcp-biblium/internal/search"
 	"github.com/mipsou/mcp-biblium/internal/storage"
@@ -21,14 +21,14 @@ import (
 // Server wraps the MCP server with Biblium-specific configuration.
 type Server struct {
 	mcp     *server.MCPServer
-	store   *corpus.FileStore
+	store   *filestore.Store
 	search  search.Searcher
 	db      *storage.DB
 	fetcher *ingest.Fetcher
 }
 
 // New creates a new Biblium MCP server with all tools registered.
-func New(store *corpus.FileStore, searcher search.Searcher, db *storage.DB) *Server {
+func New(store *filestore.Store, searcher search.Searcher, db *storage.DB) *Server {
 	s := server.NewMCPServer(
 		"biblium",
 		"0.1.0",
@@ -55,24 +55,24 @@ func (s *Server) MCPServer() *server.MCPServer {
 // registerTools registers all MCP tools on the server.
 func (s *Server) registerTools() {
 	s.mcp.AddTool(
-		mcp.NewTool("create_corpus",
-			mcp.WithDescription("Create a new knowledge corpus"),
-			mcp.WithString("name", mcp.Required(), mcp.Description("Corpus name")),
+		mcp.NewTool("create_collection",
+			mcp.WithDescription("Create a new knowledge collection"),
+			mcp.WithString("name", mcp.Required(), mcp.Description("Collection name")),
 		),
-		s.handleCreateCorpus,
+		s.handleCreateCollection,
 	)
 
 	s.mcp.AddTool(
-		mcp.NewTool("list_corpus",
-			mcp.WithDescription("List all available corpus entries"),
+		mcp.NewTool("list_collections",
+			mcp.WithDescription("List all available collections"),
 		),
-		s.handleListCorpus,
+		s.handleListCollections,
 	)
 
 	s.mcp.AddTool(
 		mcp.NewTool("add_document",
-			mcp.WithDescription("Add a document to a corpus"),
-			mcp.WithString("corpus", mcp.Required(), mcp.Description("Target corpus name")),
+			mcp.WithDescription("Add a document to a collection"),
+			mcp.WithString("collection", mcp.Required(), mcp.Description("Target collection name")),
 			mcp.WithString("name", mcp.Required(), mcp.Description("Document filename")),
 			mcp.WithString("content", mcp.Required(), mcp.Description("Document content")),
 		),
@@ -81,16 +81,16 @@ func (s *Server) registerTools() {
 
 	s.mcp.AddTool(
 		mcp.NewTool("list_documents",
-			mcp.WithDescription("List documents in a corpus"),
-			mcp.WithString("corpus", mcp.Required(), mcp.Description("Corpus name")),
+			mcp.WithDescription("List documents in a collection"),
+			mcp.WithString("collection", mcp.Required(), mcp.Description("Collection name")),
 		),
 		s.handleListDocuments,
 	)
 
 	s.mcp.AddTool(
 		mcp.NewTool("read_document",
-			mcp.WithDescription("Read a document from a corpus"),
-			mcp.WithString("corpus", mcp.Required(), mcp.Description("Corpus name")),
+			mcp.WithDescription("Read a document from a collection"),
+			mcp.WithString("collection", mcp.Required(), mcp.Description("Collection name")),
 			mcp.WithString("name", mcp.Required(), mcp.Description("Document filename")),
 		),
 		s.handleReadDocument,
@@ -98,7 +98,7 @@ func (s *Server) registerTools() {
 
 	s.mcp.AddTool(
 		mcp.NewTool("search",
-			mcp.WithDescription("Search across all corpus entries"),
+			mcp.WithDescription("Search across all collections"),
 			mcp.WithString("query", mcp.Required(), mcp.Description("Search query")),
 			mcp.WithNumber("max_results", mcp.Description("Maximum results to return")),
 		),
@@ -107,8 +107,8 @@ func (s *Server) registerTools() {
 
 	s.mcp.AddTool(
 		mcp.NewTool("suggest_url",
-			mcp.WithDescription("Suggest a URL for ingestion into a corpus (requires approval)"),
-			mcp.WithString("corpus", mcp.Required(), mcp.Description("Target corpus name")),
+			mcp.WithDescription("Suggest a URL for ingestion into a collection (requires approval)"),
+			mcp.WithString("collection", mcp.Required(), mcp.Description("Target collection name")),
 			mcp.WithString("url", mcp.Required(), mcp.Description("URL to ingest")),
 		),
 		s.handleSuggestURL,

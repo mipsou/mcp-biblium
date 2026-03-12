@@ -16,7 +16,7 @@ import (
 	"github.com/mark3labs/mcp-go/server"
 
 	"github.com/mipsou/mcp-biblium/internal/config"
-	"github.com/mipsou/mcp-biblium/internal/corpus"
+	"github.com/mipsou/mcp-biblium/internal/filestore"
 	"github.com/mipsou/mcp-biblium/internal/mcpserver"
 	"github.com/mipsou/mcp-biblium/internal/search"
 	"github.com/mipsou/mcp-biblium/internal/storage"
@@ -43,7 +43,7 @@ func main() {
 	}
 	defer db.Close()
 
-	store := corpus.NewFileStore(cfg.DataDir)
+	store := filestore.New(cfg.DataDir)
 	searcher := search.NewBM25()
 
 	// Rebuild BM25 index from existing documents on disk.

@@ -28,7 +28,7 @@ const (
 type Entry struct {
 	ID     string `json:"id"`
 	URL    string `json:"url"`
-	Corpus string `json:"corpus"`
+	Collection string `json:"collection"`
 	Status Status `json:"status"`
 }
 
@@ -46,14 +46,14 @@ func NewQueue() *Queue {
 }
 
 // Add adds a URL to the pending queue.
-func (q *Queue) Add(corpus, rawURL string) (*Entry, error) {
+func (q *Queue) Add(collection, rawURL string) (*Entry, error) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 
 	entry := &Entry{
 		ID:     uuid.New().String(),
 		URL:    rawURL,
-		Corpus: corpus,
+		Collection: collection,
 		Status: StatusPending,
 	}
 	q.entries[entry.ID] = entry

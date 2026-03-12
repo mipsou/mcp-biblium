@@ -10,7 +10,7 @@ package search
 
 // Result represents a single search result.
 type Result struct {
-	Corpus  string  `json:"corpus"`
+	Collection  string  `json:"collection"`
 	DocName string  `json:"doc_name"`
 	Score   float64 `json:"score"`
 	Snippet string  `json:"snippet"`
@@ -19,11 +19,11 @@ type Result struct {
 // Searcher is the interface for all search backends.
 type Searcher interface {
 	// Index processes a document and adds it to the search index.
-	Index(corpus, docName, content string) error
+	Index(collection, docName, content string) error
 
 	// Search returns ranked results for a query.
 	Search(query string, maxResults int) ([]Result, error)
 
 	// Remove removes a document from the index.
-	Remove(corpus, docName string) error
+	Remove(collection, docName string) error
 }

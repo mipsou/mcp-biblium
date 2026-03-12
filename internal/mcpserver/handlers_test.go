@@ -15,7 +15,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mipsou/mcp-biblium/internal/corpus"
+	"github.com/mipsou/mcp-biblium/internal/filestore"
 	"github.com/mipsou/mcp-biblium/internal/search"
 	"github.com/mipsou/mcp-biblium/internal/storage"
 )
@@ -83,20 +83,20 @@ func callTool(t *testing.T, s *Server, toolName string, args map[string]any) str
 	return resp.Result.Content[0].Text
 }
 
-func TestHandlerCreateCorpus(t *testing.T) {
+func TestHandlerCreateCollection(t *testing.T) {
 	root := t.TempDir()
-	store := corpus.NewFileStore(root)
+	store := filestore.New(root)
 	s := New(store, search.NewBM25(), openDB(t, root))
 
-	text := callTool(t, s, "create_corpus", map[string]any{"name": "infra"})
+	text := callTool(t, s, "create_collection", map[string]any{"name": "infra"})
 	if !strings.Contains(text, "infra") {
-		t.Errorf("expected response to mention corpus name, got %q", text)
+		t.Errorf("expected response to mention collection name, got %q", text)
 	}
 	if strings.HasPrefix(text, "not implemented") {
 		t.Error("handler still returns stub response")
 	}
 
-	// Verify corpus actually exists on disk.
+	// Verify collection actually exists on disk.
 	entries, err := store.List()
 	if err != nil {
 		t.Fatalf("store.List error: %v", err)
@@ -108,18 +108,18 @@ func TestHandlerCreateCorpus(t *testing.T) {
 		}
 	}
 	if !found {
-		t.Error("corpus 'infra' not found in store after create_corpus")
+		t.Error("collection 'infra' not found in store after create_collection")
 	}
 }
 
-func TestHandlerListCorpus(t *testing.T) {
+func TestHandlerListCollections(t *testing.T) {
 	root := t.TempDir()
-	store := corpus.NewFileStore(root)
+	store := filestore.New(root)
 	_ = store.Create("alpha")
 	_ = store.Create("beta")
 	s := New(store, search.NewBM25(), openDB(t, root))
 
-	text := callTool(t, s, "list_corpus", nil)
+	text := callTool(t, s, "list_collections", nil)
 	if !strings.Contains(text, "alpha") || !strings.Contains(text, "beta") {
 		t.Errorf("expected both entries in response, got %q", text)
 	}
@@ -130,12 +130,12 @@ func TestHandlerListCorpus(t *testing.T) {
 
 func TestHandlerAddDocument(t *testing.T) {
 	root := t.TempDir()
-	store := corpus.NewFileStore(root)
+	store := filestore.New(root)
 	_ = store.Create("infra")
 	s := New(store, search.NewBM25(), openDB(t, root))
 
 	text := callTool(t, s, "add_document", map[string]any{
-		"corpus":  "infra",
+		  "collection":  "infra",
 		"name":    "caddy.md",
 		"content": "Caddy is a web server",
 	})
@@ -155,13 +155,13 @@ func TestHandlerAddDocument(t *testing.T) {
 
 func TestHandlerListDocuments(t *testing.T) {
 	root := t.TempDir()
-	store := corpus.NewFileStore(root)
+	store := filestore.New(root)
 	_ = store.Create("infra")
 	_ = store.AddDoc("infra", "caddy.md", []byte("Caddy"))
 	_ = store.AddDoc("infra", "nginx.md", []byte("Nginx"))
 	s := New(store, search.NewBM25(), openDB(t, root))
 
-	text := callTool(t, s, "list_documents", map[string]any{"corpus": "infra"})
+	text := callTool(t, s, "list_documents", map[string]any{  "collection": "infra"})
 	if !strings.Contains(text, "caddy.md") || !strings.Contains(text, "nginx.md") {
 		t.Errorf("expected both docs in response, got %q", text)
 	}
@@ -172,13 +172,13 @@ func TestHandlerListDocuments(t *testing.T) {
 
 func TestHandlerReadDocument(t *testing.T) {
 	root := t.TempDir()
-	store := corpus.NewFileStore(root)
+	store := filestore.New(root)
 	_ = store.Create("infra")
 	_ = store.AddDoc("infra", "caddy.md", []byte("Caddy is great"))
 	s := New(store, search.NewBM25(), openDB(t, root))
 
 	text := callTool(t, s, "read_document", map[string]any{
-		"corpus": "infra",
+		  "collection": "infra",
 		"name":   "caddy.md",
 	})
 	if !strings.Contains(text, "Caddy is great") {
@@ -191,7 +191,7 @@ func TestHandlerReadDocument(t *testing.T) {
 
 func TestHandlerSearch(t *testing.T) {
 	root := t.TempDir()
-	store := corpus.NewFileStore(root)
+	store := filestore.New(root)
 	_ = store.Create("infra")
 	bm25 := search.NewBM25()
 	_ = bm25.Index("infra", "caddy.md", "Caddy is a web server with HTTPS")
@@ -209,12 +209,12 @@ func TestHandlerSearch(t *testing.T) {
 	}
 }
 
-func TestHandlerCreateCorpusTraversal(t *testing.T) {
+func TestHandlerCreateCollectionTraversal(t *testing.T) {
 	root := t.TempDir()
-	store := corpus.NewFileStore(root)
+	store := filestore.New(root)
 	s := New(store, search.NewBM25(), openDB(t, root))
 
-	text := callTool(t, s, "create_corpus", map[string]any{"name": "../escape"})
+	text := callTool(t, s, "create_collection", map[string]any{"name": "../escape"})
 	if !strings.Contains(text, "ERROR:") && !strings.Contains(strings.ToLower(text), "error") {
 		t.Errorf("expected error for path traversal, got %q", text)
 	}

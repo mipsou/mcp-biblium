@@ -6,7 +6,7 @@
  * https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  */
 
-package corpus
+package filestore
 
 import (
 	"os"
@@ -16,7 +16,7 @@ import (
 
 func TestListEmpty(t *testing.T) {
 	root := t.TempDir()
-	s := NewFileStore(root)
+	s := New(root)
 	names, err := s.List()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -28,7 +28,7 @@ func TestListEmpty(t *testing.T) {
 
 func TestCreateAndList(t *testing.T) {
 	root := t.TempDir()
-	s := NewFileStore(root)
+	s := New(root)
 
 	err := s.Create("infra")
 	if err != nil {
@@ -46,7 +46,7 @@ func TestCreateAndList(t *testing.T) {
 
 func TestCreateDirStructure(t *testing.T) {
 	root := t.TempDir()
-	s := NewFileStore(root)
+	s := New(root)
 	_ = s.Create("podman")
 
 	docsDir := filepath.Join(root, "podman", "docs")
@@ -61,7 +61,7 @@ func TestCreateDirStructure(t *testing.T) {
 
 func TestCreateRejectsTraversal(t *testing.T) {
 	root := t.TempDir()
-	s := NewFileStore(root)
+	s := New(root)
 	err := s.Create("../evil")
 	if err == nil {
 		t.Fatal("expected error for path traversal, got nil")
@@ -70,7 +70,7 @@ func TestCreateRejectsTraversal(t *testing.T) {
 
 func TestListDocumentsEmpty(t *testing.T) {
 	root := t.TempDir()
-	s := NewFileStore(root)
+	s := New(root)
 	_ = s.Create("test")
 
 	docs, err := s.ListDocs("test")
@@ -84,7 +84,7 @@ func TestListDocumentsEmpty(t *testing.T) {
 
 func TestAddAndListDocuments(t *testing.T) {
 	root := t.TempDir()
-	s := NewFileStore(root)
+	s := New(root)
 	_ = s.Create("test")
 
 	err := s.AddDoc("test", "hello.md", []byte("# Hello\n\nWorld"))
@@ -103,7 +103,7 @@ func TestAddAndListDocuments(t *testing.T) {
 
 func TestReadDocument(t *testing.T) {
 	root := t.TempDir()
-	s := NewFileStore(root)
+	s := New(root)
 	_ = s.Create("test")
 	_ = s.AddDoc("test", "hello.md", []byte("# Hello"))
 
@@ -118,7 +118,7 @@ func TestReadDocument(t *testing.T) {
 
 func TestAddDocRejectsTraversal(t *testing.T) {
 	root := t.TempDir()
-	s := NewFileStore(root)
+	s := New(root)
 	_ = s.Create("test")
 
 	err := s.AddDoc("test", "../../evil.md", []byte("bad"))
@@ -129,10 +129,10 @@ func TestAddDocRejectsTraversal(t *testing.T) {
 
 func TestWalkEmpty(t *testing.T) {
 	root := t.TempDir()
-	s := NewFileStore(root)
+	s := New(root)
 
 	var count int
-	err := s.Walk(func(corpus, docName, content string) error {
+	err := s.Walk(func(collection, docName, content string) error {
 		count++
 		return nil
 	})
@@ -146,17 +146,17 @@ func TestWalkEmpty(t *testing.T) {
 
 func TestWalkVisitsAllDocs(t *testing.T) {
 	root := t.TempDir()
-	s := NewFileStore(root)
+	s := New(root)
 	_ = s.Create("infra")
 	_ = s.Create("golang")
 	_ = s.AddDoc("infra", "a.md", []byte("doc A"))
 	_ = s.AddDoc("infra", "b.md", []byte("doc B"))
 	_ = s.AddDoc("golang", "c.md", []byte("doc C"))
 
-	type doc struct{ corpus, name, content string }
+	type doc struct{ collection, name, content string }
 	var docs []doc
-	err := s.Walk(func(corpus, docName, content string) error {
-		docs = append(docs, doc{corpus, docName, content})
+	err := s.Walk(func(collection, docName, content string) error {
+		docs = append(docs, doc{collection, docName, content})
 		return nil
 	})
 	if err != nil {
