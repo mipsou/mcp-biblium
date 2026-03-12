@@ -22,7 +22,7 @@ func TestFetchConvertsHTMLToMarkdown(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	f := NewFetcher()
+	f := newTestFetcher()
 	md, err := f.Fetch(srv.URL)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -69,7 +69,7 @@ func TestFetchHandles404(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	f := NewFetcher()
+	f := newTestFetcher()
 	_, err := f.Fetch(srv.URL)
 	if err == nil {
 		t.Fatal("expected error for 404 response")
