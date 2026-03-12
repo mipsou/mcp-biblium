@@ -66,19 +66,19 @@ Then ask Claude: *"Create a collection called 'golang' and add my notes about er
 Claude / MCP Client
         │
         ▼ (stdio JSON-RPC)
-    ┌────────┐
-    │Biblium │
-    └────┬───┘
-         │
-    ┌────┴────┐
-    │         │
-    ▼         ▼
- FileStore  SQLite
- (docs/)   (pending URLs)
-    │
-    ▼
-  BM25 Index
- (in-memory)
+   ┌──────────┐
+   │ Biblium  │
+   └────┬─────┘
+        │
+   ┌────┴────┐
+   │         │
+   ▼         ▼
+FileStore  SQLite
+(docs/)   (pending URLs)
+   │
+   ▼
+BM25 Index
+(in-memory)
 ```
 
 Collections live as directories on disk. Documents are plain text files. The BM25 index rebuilds from disk on startup — no separate database for search.
@@ -168,19 +168,19 @@ Puis demandez à Claude : *« Crée une collection 'golang' et ajoute mes notes 
 Claude / Client MCP
         │
         ▼ (stdio JSON-RPC)
-    ┌────────┐
-    │Biblium │
-    └────┬───┘
-         │
-    ┌────┴────┐
-    │         │
-    ▼         ▼
- FileStore  SQLite
- (docs/)   (URLs en attente)
-    │
-    ▼
-  Index BM25
- (en mémoire)
+   ┌──────────┐
+   │ Biblium  │
+   └────┬─────┘
+        │
+   ┌────┴────┐
+   │         │
+   ▼         ▼
+FileStore  SQLite
+(docs/)   (URLs en attente)
+   │
+   ▼
+Index BM25
+(en mémoire)
 ```
 
 Les collections sont des répertoires sur disque. Les documents sont des fichiers texte. L'index BM25 se reconstruit au démarrage — pas de base séparée pour la recherche.
