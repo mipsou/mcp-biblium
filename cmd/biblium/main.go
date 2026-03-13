@@ -30,7 +30,7 @@ func main() {
 	}
 
 	// Ensure data directory exists.
-	if err := os.MkdirAll(cfg.DataDir, 0o755); err != nil {
+	if err := os.MkdirAll(cfg.DataDir, 0o750); err != nil {
 		fmt.Fprintf(os.Stderr, "biblium: mkdir error: %v\n", err)
 		os.Exit(1)
 	}
