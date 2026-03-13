@@ -136,7 +136,9 @@ GOOS=openbsd GOARCH=amd64 go build -o biblium ./cmd/biblium
 
 ### License
 
-[EUPL-1.2-or-later](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12) — Free and open source, compatible with GPL, AGPL, MPL.
+[EUPL-1.2-or-later](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12) — A **copyleft** license (similar in spirit to LGPL/MPL).
+
+EUPL's [Article 5](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12#article-5) allows downstream redistribution under: GPL-2.0+, AGPL-3.0, LGPL-2.1+, MPL-2.0, EPL-1.0/2.0, CeCILL-2.0/2.1. See the [compatibility list](https://joinup.ec.europa.eu/collection/eupl/matrix-eupl-compatible-open-source-licences).
 
 ---
 
@@ -251,4 +253,6 @@ GOOS=openbsd GOARCH=amd64 go build -o biblium ./cmd/biblium
 
 ### Licence
 
-[EUPL-1.2-ou-ultérieure](https://interoperable-europe.ec.europa.eu/sites/default/files/inline-files/EUPL%20v1_2%20FR.txt) — Libre et open source, compatible GPL, AGPL, MPL.
+[EUPL-1.2-ou-ultérieure](https://interoperable-europe.ec.europa.eu/sites/default/files/inline-files/EUPL%20v1_2%20FR.txt) — Licence **copyleft** (similaire en esprit à LGPL/MPL).
+
+L'[Article 5](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12#article-5) de l'EUPL permet la redistribution sous : GPL-2.0+, AGPL-3.0, LGPL-2.1+, MPL-2.0, EPL-1.0/2.0, CeCILL-2.0/2.1. Voir la [matrice de compatibilité](https://joinup.ec.europa.eu/collection/eupl/matrix-eupl-compatible-open-source-licences).
