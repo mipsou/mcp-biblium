@@ -44,3 +44,5 @@ For security vulnerabilities, use [GitHub Security Advisories](https://github.co
 ## License
 
 By contributing, you agree that your contributions will be licensed under [EUPL-1.2](LICENSE).
+
+**What this means:** EUPL-1.2 is a **copyleft** license (similar to LGPL/MPL). Your contributions remain open source and cannot be relicensed under a permissive license (BSD, MIT, ISC). However, EUPL's [Article 5](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12#article-5) allows downstream redistribution under GPL-2.0+, AGPL-3.0, LGPL-2.1+, MPL-2.0, and others. See the full [compatibility matrix](https://joinup.ec.europa.eu/collection/eupl/matrix-eupl-compatible-open-source-licences).
