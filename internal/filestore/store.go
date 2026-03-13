@@ -51,7 +51,7 @@ func (s *Store) Create(name string) error {
 		return err
 	}
 	docsDir := filepath.Join(s.root, name, "docs")
-	return os.MkdirAll(docsDir, 0o755)
+	return os.MkdirAll(docsDir, 0o750)
 }
 
 // ListDocs returns the filenames of all documents in a collection.
@@ -84,7 +84,7 @@ func (s *Store) AddDoc(collection, name string, data []byte) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(resolved, data, 0o644)
+	return os.WriteFile(resolved, data, 0o600)
 }
 
 // ReadDoc reads a document from a collection.
@@ -94,7 +94,7 @@ func (s *Store) ReadDoc(collection, name string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return os.ReadFile(resolved)
+	return os.ReadFile(resolved) // #nosec G304 — path validated by safepath.Resolve
 }
 
 // Walk iterates over all documents in every collection, calling fn for each.

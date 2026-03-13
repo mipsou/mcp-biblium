@@ -31,13 +31,13 @@ func Open(path string) (*DB, error) {
 
 	// WAL mode for concurrent reads.
 	if _, err := conn.Exec(`PRAGMA journal_mode=WAL`); err != nil {
-		conn.Close()
+		_ = conn.Close()
 		return nil, err
 	}
 
 	d := &DB{db: conn}
 	if err := d.migrate(); err != nil {
-		conn.Close()
+		_ = conn.Close()
 		return nil, err
 	}
 	return d, nil
