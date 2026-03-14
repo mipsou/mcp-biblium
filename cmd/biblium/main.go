@@ -1,9 +1,7 @@
 /*
  * Copyright (c) 2026 Mipsou <chpujol@gmail.com>
  *
- * Licensed under the EUPL, Version 1.2 or later.
- * You may obtain a copy at:
- * https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+ * SPDX-License-Identifier: EUPL-1.2 OR BSD-2-Clause
  */
 
 package main
@@ -21,6 +19,9 @@ import (
 	"github.com/mipsou/mcp-biblium/internal/search"
 	"github.com/mipsou/mcp-biblium/internal/storage"
 )
+
+// version is set at build time via -ldflags "-X main.version=...".
+var version = "dev"
 
 func main() {
 	cfg, err := config.Load()
@@ -57,7 +58,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	srv := mcpserver.New(store, searcher, db)
+	srv := mcpserver.New(store, searcher, db, version)
 
 	fmt.Fprintf(os.Stderr, "biblium: starting (data=%s, search=%s, indexed=%d docs)\n",
 		cfg.DataDir, cfg.SearchBackend, indexed)

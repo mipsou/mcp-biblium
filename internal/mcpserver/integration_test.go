@@ -1,9 +1,7 @@
 /*
  * Copyright (c) 2026 Mipsou <chpujol@gmail.com>
  *
- * Licensed under the EUPL, Version 1.2 or later.
- * You may obtain a copy at:
- * https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+ * SPDX-License-Identifier: EUPL-1.2 OR BSD-2-Clause
  */
 
 package mcpserver
@@ -29,7 +27,7 @@ func TestIntegrationFullWorkflow(t *testing.T) {
 		t.Fatalf("storage.Open: %v", err)
 	}
 	defer db.Close()
-	s := New(store, bm25, db)
+	s := New(store, bm25, db, "test")
 
 	// 1. Create a filestore.
 	text := callTool(t, s, "create_collection", map[string]any{"name": "homelab"})
@@ -113,7 +111,7 @@ func TestPersistenceSurvivesRestart(t *testing.T) {
 	if err != nil {
 		t.Fatalf("storage.Open: %v", err)
 	}
-	s1 := New(store, bm25, db1)
+	s1 := New(store, bm25, db1, "test")
 
 	callTool(t, s1, "create_collection", map[string]any{"name": "infra"})
 	callTool(t, s1, "add_document", map[string]any{
@@ -151,7 +149,7 @@ func TestPersistenceSurvivesRestart(t *testing.T) {
 		t.Fatalf("storage.Open: %v", err)
 	}
 	defer db2.Close()
-	s2 := New(store, bm25v2, db2)
+	s2 := New(store, bm25v2, db2, "test")
 
 	// Search should still work after "restart".
 	text := callTool(t, s2, "search", map[string]any{

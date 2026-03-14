@@ -1,9 +1,7 @@
 /*
  * Copyright (c) 2026 Mipsou <chpujol@gmail.com>
  *
- * Licensed under the EUPL, Version 1.2 or later.
- * You may obtain a copy at:
- * https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+ * SPDX-License-Identifier: EUPL-1.2 OR BSD-2-Clause
  */
 
 package mcpserver
@@ -28,10 +26,10 @@ type Server struct {
 }
 
 // New creates a new Biblium MCP server with all tools registered.
-func New(store *filestore.Store, searcher search.Searcher, db *storage.DB) *Server {
+func New(store *filestore.Store, searcher search.Searcher, db *storage.DB, version string) *Server {
 	s := server.NewMCPServer(
 		"biblium",
-		"0.1.0",
+		version,
 		server.WithToolCapabilities(false),
 	)
 

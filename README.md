@@ -2,7 +2,7 @@
 
 [![GitHub Stars](https://img.shields.io/github/stars/mipsou/mcp-biblium?style=flat-square)](https://github.com/mipsou/mcp-biblium/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/mipsou/mcp-biblium?style=flat-square)](https://github.com/mipsou/mcp-biblium/network)
-[![License](https://img.shields.io/badge/license-EUPL--1.2-blue?style=flat-square)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12)
+[![License](https://img.shields.io/badge/license-EUPL--1.2_OR_BSD--2-blue?style=flat-square)](https://github.com/mipsou/mcp-biblium/blob/main/LICENSE)
 [![CI](https://img.shields.io/github/actions/workflow/status/mipsou/mcp-biblium/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/mipsou/mcp-biblium/actions)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/mipsou/mcp-biblium?style=flat-square)](https://go.dev/)
 [![Last Commit](https://img.shields.io/github/last-commit/mipsou/mcp-biblium?style=flat-square)](https://github.com/mipsou/mcp-biblium/commits/main)
@@ -39,6 +39,8 @@ Drop documentation, notes, or any text into named collections. Biblium indexes e
 - **~17 MB binary, ~2600 lines of Go** — Small, auditable, maintainable.
 
 ### Quick start
+
+> **Claude Desktop:** download the `.mcpb` bundle from [Releases](https://github.com/mipsou/mcp-biblium/releases) and drag it into Settings.
 
 ```bash
 # Install directly
@@ -136,7 +138,7 @@ GOOS=openbsd GOARCH=amd64 go build -o biblium ./cmd/biblium
 
 ### License
 
-[EUPL-1.2-or-later](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12) — Free and open source, compatible with GPL, AGPL, MPL.
+Dual-licensed: [EUPL-1.2](LICENSE) OR [BSD-2-Clause](LICENSE-BSD) — your choice.
 
 ---
 
@@ -154,6 +156,8 @@ Déposez de la documentation, des notes ou du texte dans des collections nommée
 - **~17 Mo, ~2600 lignes de Go** — Petit, auditable, maintenable.
 
 ### Démarrage rapide
+
+> **Claude Desktop :** téléchargez le bundle `.mcpb` depuis les [Releases](https://github.com/mipsou/mcp-biblium/releases) et glissez-le dans les Paramètres.
 
 ```bash
 # Installer directement
@@ -251,4 +255,4 @@ GOOS=openbsd GOARCH=amd64 go build -o biblium ./cmd/biblium
 
 ### Licence
 
-[EUPL-1.2-ou-ultérieure](https://interoperable-europe.ec.europa.eu/sites/default/files/inline-files/EUPL%20v1_2%20FR.txt) — Libre et open source, compatible GPL, AGPL, MPL.
+Double licence : [EUPL-1.2](LICENSE) OU [BSD-2-Clause](LICENSE-BSD) — au choix.

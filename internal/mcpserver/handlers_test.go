@@ -1,9 +1,7 @@
 /*
  * Copyright (c) 2026 Mipsou <chpujol@gmail.com>
  *
- * Licensed under the EUPL, Version 1.2 or later.
- * You may obtain a copy at:
- * https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+ * SPDX-License-Identifier: EUPL-1.2 OR BSD-2-Clause
  */
 
 package mcpserver
@@ -86,7 +84,7 @@ func callTool(t *testing.T, s *Server, toolName string, args map[string]any) str
 func TestHandlerCreateCollection(t *testing.T) {
 	root := t.TempDir()
 	store := filestore.New(root)
-	s := New(store, search.NewBM25(), openDB(t, root))
+	s := New(store, search.NewBM25(), openDB(t, root), "test")
 
 	text := callTool(t, s, "create_collection", map[string]any{"name": "infra"})
 	if !strings.Contains(text, "infra") {
@@ -117,7 +115,7 @@ func TestHandlerListCollections(t *testing.T) {
 	store := filestore.New(root)
 	_ = store.Create("alpha")
 	_ = store.Create("beta")
-	s := New(store, search.NewBM25(), openDB(t, root))
+	s := New(store, search.NewBM25(), openDB(t, root), "test")
 
 	text := callTool(t, s, "list_collections", nil)
 	if !strings.Contains(text, "alpha") || !strings.Contains(text, "beta") {
@@ -132,7 +130,7 @@ func TestHandlerAddDocument(t *testing.T) {
 	root := t.TempDir()
 	store := filestore.New(root)
 	_ = store.Create("infra")
-	s := New(store, search.NewBM25(), openDB(t, root))
+	s := New(store, search.NewBM25(), openDB(t, root), "test")
 
 	text := callTool(t, s, "add_document", map[string]any{
 		  "collection":  "infra",
@@ -159,7 +157,7 @@ func TestHandlerListDocuments(t *testing.T) {
 	_ = store.Create("infra")
 	_ = store.AddDoc("infra", "caddy.md", []byte("Caddy"))
 	_ = store.AddDoc("infra", "nginx.md", []byte("Nginx"))
-	s := New(store, search.NewBM25(), openDB(t, root))
+	s := New(store, search.NewBM25(), openDB(t, root), "test")
 
 	text := callTool(t, s, "list_documents", map[string]any{  "collection": "infra"})
 	if !strings.Contains(text, "caddy.md") || !strings.Contains(text, "nginx.md") {
@@ -175,7 +173,7 @@ func TestHandlerReadDocument(t *testing.T) {
 	store := filestore.New(root)
 	_ = store.Create("infra")
 	_ = store.AddDoc("infra", "caddy.md", []byte("Caddy is great"))
-	s := New(store, search.NewBM25(), openDB(t, root))
+	s := New(store, search.NewBM25(), openDB(t, root), "test")
 
 	text := callTool(t, s, "read_document", map[string]any{
 		  "collection": "infra",
@@ -195,7 +193,7 @@ func TestHandlerSearch(t *testing.T) {
 	_ = store.Create("infra")
 	bm25 := search.NewBM25()
 	_ = bm25.Index("infra", "caddy.md", "Caddy is a web server with HTTPS")
-	s := New(store, bm25, openDB(t, root))
+	s := New(store, bm25, openDB(t, root), "test")
 
 	text := callTool(t, s, "search", map[string]any{
 		"query":       "caddy HTTPS",
@@ -212,7 +210,7 @@ func TestHandlerSearch(t *testing.T) {
 func TestHandlerCreateCollectionTraversal(t *testing.T) {
 	root := t.TempDir()
 	store := filestore.New(root)
-	s := New(store, search.NewBM25(), openDB(t, root))
+	s := New(store, search.NewBM25(), openDB(t, root), "test")
 
 	text := callTool(t, s, "create_collection", map[string]any{"name": "../escape"})
 	if !strings.Contains(text, "ERROR:") && !strings.Contains(strings.ToLower(text), "error") {

@@ -43,4 +43,4 @@ For security vulnerabilities, use [GitHub Security Advisories](https://github.co
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under [EUPL-1.2](LICENSE).
+This project is dual-licensed: [EUPL-1.2](LICENSE) OR [BSD-2-Clause](LICENSE-BSD). By contributing, you agree that your contributions will be available under both licenses.
