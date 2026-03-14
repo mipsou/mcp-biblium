@@ -22,6 +22,9 @@ import (
 	"github.com/mipsou/mcp-biblium/internal/storage"
 )
 
+// version is set at build time via -ldflags "-X main.version=...".
+var version = "dev"
+
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
@@ -57,7 +60,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	srv := mcpserver.New(store, searcher, db)
+	srv := mcpserver.New(store, searcher, db, version)
 
 	fmt.Fprintf(os.Stderr, "biblium: starting (data=%s, search=%s, indexed=%d docs)\n",
 		cfg.DataDir, cfg.SearchBackend, indexed)

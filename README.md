@@ -40,6 +40,8 @@ Drop documentation, notes, or any text into named collections. Biblium indexes e
 
 ### Quick start
 
+> **Claude Desktop:** download the `.mcpb` bundle from [Releases](https://github.com/mipsou/mcp-biblium/releases) and drag it into Settings.
+
 ```bash
 # Install directly
 go install github.com/mipsou/mcp-biblium/cmd/biblium@latest
@@ -156,6 +158,8 @@ Déposez de la documentation, des notes ou du texte dans des collections nommée
 - **~17 Mo, ~2600 lignes de Go** — Petit, auditable, maintenable.
 
 ### Démarrage rapide
+
+> **Claude Desktop :** téléchargez le bundle `.mcpb` depuis les [Releases](https://github.com/mipsou/mcp-biblium/releases) et glissez-le dans les Paramètres.
 
 ```bash
 # Installer directement

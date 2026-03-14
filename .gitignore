@@ -3,6 +3,7 @@
 /biblium.exe
 /build/
 /dist/
+*.mcpb
 
 # IDE
 .idea/
