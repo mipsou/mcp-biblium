@@ -1,0 +1,55 @@
+{
+  "manifest_version": "0.3",
+  "name": "biblium",
+  "display_name": "Biblium",
+  "version": "{{VERSION}}",
+  "description": "Persistent knowledge base for LLMs via MCP. Store, search, and retrieve documents organized into collections.",
+  "long_description": "Biblium gives LLMs persistent, searchable memory through the Model Context Protocol. Drop documentation, notes, or any text into named collections. Everything is indexed with BM25 ranking and instantly searchable by your AI assistant. Single binary, zero CGO, works offline.",
+  "author": {
+    "name": "mipsou",
+    "url": "https://github.com/mipsou"
+  },
+  "license": "EUPL-1.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mipsou/mcp-biblium"
+  },
+  "homepage": "https://github.com/mipsou/mcp-biblium",
+  "keywords": ["knowledge-base", "documents", "search", "bm25", "collections", "offline"],
+  "server": {
+    "type": "binary",
+    "entry_point": "server/{{BINARY}}",
+    "mcp_config": {
+      "command": "${__dirname}/server/{{BINARY}}",
+      "args": [],
+      "env": {
+        "BIBLIUM_DATA_DIR": "${user_config.data_dir}",
+        "BIBLIUM_SEARCH_BACKEND": "bm25",
+        "BIBLIUM_LOG_LEVEL": "info"
+      }
+    }
+  },
+  "user_config": {
+    "data_dir": {
+      "type": "directory",
+      "title": "Data directory",
+      "description": "Where Biblium stores collections and documents",
+      "required": true,
+      "default": "${HOME}/biblium_data"
+    }
+  },
+  "tools": [
+    { "name": "create_collection", "description": "Create a new knowledge collection" },
+    { "name": "list_collections", "description": "List all available collections" },
+    { "name": "add_document", "description": "Add a document to a collection" },
+    { "name": "list_documents", "description": "List documents in a collection" },
+    { "name": "read_document", "description": "Read a document from a collection" },
+    { "name": "search", "description": "Search across all collections (BM25)" },
+    { "name": "suggest_url", "description": "Suggest a URL for ingestion (requires approval)" },
+    { "name": "approve_url", "description": "Approve a pending URL for ingestion" },
+    { "name": "list_pending", "description": "List all pending URL suggestions" }
+  ],
+  "compatibility": {
+    "platforms": ["{{PLATFORM}}"]
+  }
+}

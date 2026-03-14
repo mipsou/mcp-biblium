@@ -28,10 +28,10 @@ type Server struct {
 }
 
 // New creates a new Biblium MCP server with all tools registered.
-func New(store *filestore.Store, searcher search.Searcher, db *storage.DB) *Server {
+func New(store *filestore.Store, searcher search.Searcher, db *storage.DB, version string) *Server {
 	s := server.NewMCPServer(
 		"biblium",
-		"0.1.0",
+		version,
 		server.WithToolCapabilities(false),
 	)
 
